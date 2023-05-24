@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify'
+import { prisma } from '../lib/prisma'
 
 export async function appRoutes(app: FastifyInstance) {
   app.get('/twitchAuthURL', async (request) => {
@@ -9,5 +10,21 @@ export async function appRoutes(app: FastifyInstance) {
     )
 
     return { url: preURL.concat(`${scopes}`) }
+  })
+
+  app.get('/users', async (request) => {
+    return await prisma.users.findMany({
+      select: {
+        twitchID: true,
+        twitchLogin: true,
+        twitchProfileImg: true,
+        followers: true,
+        alertID: true,
+        createdAt: true,
+      },
+      orderBy: {
+        twitchLogin: 'asc',
+      },
+    })
   })
 }
