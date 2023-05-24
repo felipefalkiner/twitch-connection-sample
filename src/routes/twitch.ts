@@ -1,12 +1,13 @@
 import { FastifyInstance } from 'fastify'
 import axios from 'axios'
 import { prisma } from '../lib/prisma'
-// import { refreshToken } from '../lib/twitch'
+import { validateUserToken } from '../lib/twitch'
+
+const client_id = process.env.TWITCH_CLIENT_ID
 
 export async function twitchRoutes(app: FastifyInstance) {
   app.post('/register', async (request) => {
     const { code } = request.body
-    const client_id = process.env.TWITCH_CLIENT_ID
 
     const postData = {
       client_id,
@@ -73,5 +74,24 @@ export async function twitchRoutes(app: FastifyInstance) {
         },
       })
     }
+  })
+
+  app.post('/changeTitle/:userId', async (request) => {
+    const { userId } = request.params
+    const { title } = request.body
+
+    const { accessToken, twitchID } = await validateUserToken(userId)
+
+    await axios.patch(
+      `https://api.twitch.tv/helix/channels?broadcaster_id=${twitchID}`,
+      { title },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Client-Id': client_id,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
   })
 }
