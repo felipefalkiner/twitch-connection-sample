@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import axios from 'axios'
 import { prisma } from '../lib/prisma'
-import { refreshToken } from '../lib/twitch'
+// import { refreshToken } from '../lib/twitch'
 
 export async function twitchRoutes(app: FastifyInstance) {
   app.post('/register', async (request) => {
