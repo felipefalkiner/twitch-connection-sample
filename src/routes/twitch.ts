@@ -1,13 +1,14 @@
 import { FastifyInstance } from 'fastify'
 import axios from 'axios'
 import { prisma } from '../lib/prisma'
+import { refreshToken } from '../lib/twitch'
 
 export async function twitchRoutes(app: FastifyInstance) {
   app.post('/register', async (request) => {
     const { code } = request.body
     const client_id = process.env.TWITCH_CLIENT_ID
 
-    const data = {
+    const postData = {
       client_id,
       client_secret: process.env.TWITCH_CLIENT_SECRET,
       code,
@@ -17,7 +18,7 @@ export async function twitchRoutes(app: FastifyInstance) {
 
     const twitchTokens = await axios.post(
       'https://id.twitch.tv/oauth2/token',
-      data,
+      postData,
       {
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
       },
