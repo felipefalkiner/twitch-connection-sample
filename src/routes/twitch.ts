@@ -94,4 +94,22 @@ export async function twitchRoutes(app: FastifyInstance) {
       },
     )
   })
+
+  app.get('/subsTotal/:userId', async (request) => {
+    const { userId } = request.params
+
+    const { accessToken, twitchID } = await validateUserToken(userId)
+
+    const { data: subsResponse } = await axios.get(
+      `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${twitchID}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Client-Id': client_id,
+        },
+      },
+    )
+
+    return { total: subsResponse.total }
+  })
 }
